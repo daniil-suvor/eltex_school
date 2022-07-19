@@ -50,18 +50,18 @@ void menu_add_contact(struct telephone_directory* directory) {
         struct contact contact;
         printf("input name\n");
         scanf("%50s", contact.name);
-        free_buff();
+        free_buff();  //Clear input buffer if input was bigger than max length name.
         printf("input lastname\n");
         scanf("%50s", contact.lastname);
-        free_buff();
+        free_buff();  // Clear input buffer if input was bigger than max length name.
         printf("input phone number\n");
-        while(scanf("%d", &contact.phone_number) != 1) {
+        while((scanf("%d", &contact.phone_number) != 1) && (contact.phone_number > 0)) { 
             printf("Error number, try again!\n");
-            free_buff();
+            free_buff();  // Clear input buffer if previous input has errors
         }
         add_contact(directory, &contact);
     } else {
-        printf("Telefon directory is fell!\n\n");
+        printf("Telefon directory is full!\n\n");
     }
     
 }

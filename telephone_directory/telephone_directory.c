@@ -3,7 +3,7 @@
 
 void init_directory(struct telephone_directory* direcotry) {
     for (int i = 0; i < MAX_NUMBER; i++) {
-        direcotry->contacts[i].phone_number = -1;
+        direcotry->contacts[i].phone_number = -1;  // flag determine empty contact
     }
     direcotry->amount = 0;
 }
