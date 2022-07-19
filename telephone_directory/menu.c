@@ -82,7 +82,7 @@ void menu() {
     init_directory(&directory);
     int comand = 0;
     while (comand != EXIT) {
-        printf("\033[H\033[J");
+        printf("\033[H\033[J");  // clear screen
         print_menu();
         scanf("%d", &comand);
         switch(comand) {
