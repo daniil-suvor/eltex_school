@@ -24,6 +24,6 @@ struct telephone_directory {
 void init_directory(struct telephone_directory* direcotry);
 int delete_contact(struct telephone_directory* direcotry, int number);
 struct contact* find_contact(struct telephone_directory* direcotry, int number);
-int add_contact(struct telephone_directory* direcotry);
+int add_contact(struct telephone_directory* direcotry, struct contact* contact);
 void free_buff();
 #endif  // TELEFONE_DIRECTORY_H_
