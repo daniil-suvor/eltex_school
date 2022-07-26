@@ -14,7 +14,6 @@ void menu_delete(struct telephone_directory* directory) {
             printf("Contact isn't finded!\n\n");
         }
     } else {
-        free_buff();
         printf("Not correct phone number!\n\n");
     }
 }
@@ -31,7 +30,6 @@ void menu_find(struct telephone_directory* directory) {
             printf("Contact isn't finded!\n\n");
         }
     } else {
-        free_buff();
         printf("Not correct phone number!\n\n");
     }
 }
@@ -47,6 +45,30 @@ void print_all_contact(struct telephone_directory* direcotry) {
         }
     }
 }
+void menu_add_contact(struct telephone_directory* directory) {
+    if (directory->amount < MAX_NUMBER) {
+        struct contact contact;
+        printf("input name\n");
+        scanf("%50s", contact.name);
+        free_buff();  //Clear input buffer if input was bigger than max length name.
+        printf("input lastname\n");
+        scanf("%50s", contact.lastname);
+        free_buff();  // Clear input buffer if input was bigger than max length name.
+        printf("input phone number\n");
+        while((scanf("%d", &contact.phone_number) != 1) && (contact.phone_number > 0)) { 
+            printf("Error number, try again!\n");
+            free_buff();  // Clear input buffer if previous input has errors
+        }
+        add_contact(directory, &contact);
+    } else {
+        printf("Telefon directory is full!\n\n");
+    }
+    
+}
+void free_buff() {
+    char ch;
+    while ((ch = getchar()) != '\n') {}
+}
 void print_menu() {
     printf("Input comands:\n");
     printf("0 - for add contacts\n");
@@ -60,15 +82,12 @@ void menu() {
     init_directory(&directory);
     int comand = 0;
     while (comand != EXIT) {
+        printf("\033[H\033[J");  // clear screen
         print_menu();
-        printf("\033[H\033[J");
-        if (scanf("%d", &comand) != 1) {
-            printf("Error comand!\n");
-            free_buff();
-        };
+        scanf("%d", &comand);
         switch(comand) {
             case(ADD):
-                add_contact(&directory);
+                menu_add_contact(&directory);
                 break;
             case(DELETE):
                 menu_delete(&directory);
@@ -83,8 +102,8 @@ void menu() {
                 break;
             default:
                 printf("Error comand!\n");
-                free_buff();
                 break;
         }
+        free_buff();
     }
 }
