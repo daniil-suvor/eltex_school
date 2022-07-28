@@ -11,7 +11,8 @@
     Function parse command for telephone directory.
 
     menu_find, menu_delete, menu_add_contat - functions use
-    relevant interfaces telephone directory and process errors 
+    relevant interfaces telephone directory and process errors.
+    Function print all contact with need number.
     
     print_contact - function draw out all fields structure contact
     

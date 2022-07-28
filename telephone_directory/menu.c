@@ -30,6 +30,7 @@ void menu_find(struct contact* directory) {
     if (scanf("%d", &number) == 1) {
         f_contact = find_contact(directory, number);
         if (f_contact != NULL) {
+            // Print all contact with need number. As the numbers are sorted
             while((f_contact != NULL) && (f_contact->phone_number == number)) {
                 printf("Find contact:\n");
                 print_contact(f_contact);

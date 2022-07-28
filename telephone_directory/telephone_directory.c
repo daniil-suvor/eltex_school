@@ -16,7 +16,7 @@ struct contact* init_directory(int number, char* name, char* lastname) {
 int delete_contact(struct contact** head_direcotry, int number) {
     int rez = 0;
     struct contact* buff_head = NULL;
-    if ((*head_direcotry)->phone_number == number) {
+    if ((*head_direcotry)->phone_number == number) { // if need delete head
         buff_head = *head_direcotry;
         *head_direcotry = (*head_direcotry)->next;
         free(buff_head);
@@ -50,7 +50,7 @@ int add_contact(struct contact** head_direcotry, int number, char* name, char* l
     struct contact* buff_head = NULL;
     struct contact* new_contact = init_directory(number, name, lastname);
     if (new_contact != NULL) {
-        if ((*head_direcotry)->phone_number > number) {
+        if ((*head_direcotry)->phone_number > number) { // if need add to head place
             new_contact->next = (*head_direcotry);
             (*head_direcotry)->previous = new_contact;
             *head_direcotry = new_contact;

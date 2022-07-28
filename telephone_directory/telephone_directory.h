@@ -10,10 +10,12 @@
     delete_contact - function delete contact.
     Function use telephone number for find needing contact.
     Function return 1 if delete was success and 0 otherwise.
+    Function delete first contact with need number.
 
     find_contact - function for find contact.
     Function use telephone number for find needing contact.
     Function return struct contact* if find was success and NULL otherwise.
+    Function find first contact with need number.
 
     add_contact - function for add contact.
     Function return 1 if add was success and 0 otherwise.
