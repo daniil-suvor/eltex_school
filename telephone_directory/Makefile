@@ -9,7 +9,12 @@ telephone_directory.o: telephone_directory.c telephone_directory.h
 main: telephone_directory.o menu.o
 	$(CC) telephone_directory.o menu.o -o main
 test: main
-	./main < my_test && echo "RASSED"
+	./main < my_test_1
+	./main < my_test_2
+check_leack: main
+	valgrind --leak-check=full -s ./main < my_test_1 > out
+	valgrind --leak-check=full -s ./main < my_test_2 > out
+	rm out
 clean:
 	rm *.o
 	rm main

@@ -23,10 +23,10 @@
 
 void print_menu();
 void menu();
-void menu_find(struct telephone_directory* directory);
-void menu_delete(struct telephone_directory* directory);
-void menu_add_contact(struct telephone_directory* directory);
+void menu_find(struct contact* directory);
+void menu_delete(struct contact** directory);
+void menu_add_contact(struct contact** directory);
 void print_contact(struct contact* contact);
-void print_all_contact(struct telephone_directory* direcotry);
+void print_all_contact(struct contact* direcotry);
 void free_buff();
 #endif  // MENU_H_

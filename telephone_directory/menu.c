@@ -6,26 +6,35 @@ int main() {
     menu();
     return 0;
 }
-void menu_delete(struct telephone_directory* directory) {
+void menu_delete(struct contact** directory) {
     int number = 0;
     printf("Input phone number for delete\n");
     if (scanf("%d", &number) == 1) {
-        if (delete_contact(directory, number) == 1) {
-            printf("Contact isn't finded!\n\n");
+        if (*directory != NULL) {
+            if (delete_contact(directory, number) == 0) {
+                printf("Contact isn't finded!\n\n");
+            } else {
+                printf("Success delete!\n\n");
+            }
+        } else {
+            printf("Error delete. directory is empty!\n\n");
         }
     } else {
         printf("Not correct phone number!\n\n");
     }
 }
-void menu_find(struct telephone_directory* directory) {
+void menu_find(struct contact* directory) {
     int number = 0;
     struct contact* f_contact;
     printf("Input phone number for find\n");
     if (scanf("%d", &number) == 1) {
         f_contact = find_contact(directory, number);
         if (f_contact != NULL) {
-            printf("Find contact:\n");
-            print_contact(f_contact);
+            while((f_contact != NULL) && (f_contact->phone_number == number)) {
+                printf("Find contact:\n");
+                print_contact(f_contact);
+                f_contact = f_contact->next;
+            }
         } else {
             printf("Contact isn't finded!\n\n");
         }
@@ -38,32 +47,34 @@ void print_contact(struct contact* contact) {
     printf("Lastname is %s\n", contact->lastname);
     printf("Phone number is %d\n\n", contact->phone_number);
 }
-void print_all_contact(struct telephone_directory* direcotry) {
-     for (int i = 0; i < MAX_NUMBER; i++) {
-        if (direcotry->contacts[i].phone_number != -1) {
-            print_contact(&direcotry->contacts[i]);
-        }
+void print_all_contact(struct contact* direcotry) {
+    while (direcotry != NULL) {
+        print_contact(direcotry);
+        direcotry = direcotry->next;
     }
 }
-void menu_add_contact(struct telephone_directory* directory) {
-    if (directory->amount < MAX_NUMBER) {
-        struct contact contact;
-        printf("input name\n");
-        scanf("%50s", contact.name);
-        free_buff();  //Clear input buffer if input was bigger than max length name.
-        printf("input lastname\n");
-        scanf("%50s", contact.lastname);
-        free_buff();  // Clear input buffer if input was bigger than max length name.
-        printf("input phone number\n");
-        while((scanf("%d", &contact.phone_number) != 1) && (contact.phone_number > 0)) { 
-            printf("Error number, try again!\n");
-            free_buff();  // Clear input buffer if previous input has errors
-        }
-        add_contact(directory, &contact);
-    } else {
-        printf("Telefon directory is full!\n\n");
+void menu_add_contact(struct contact** directory) {
+    int number = 0;
+    char name[MAX_NAME];
+    char lastname[MAX_NAME];
+    printf("input name\n");
+    scanf("%50s", name);
+    free_buff();  //Clear input buffer if input was bigger than max length name.
+    printf("input lastname\n");
+    scanf("%50s", lastname);
+    free_buff();  // Clear input buffer if input was bigger than max length name.
+    printf("input phone number\n");
+    while((scanf("%d", &number) != 1) || (number < 0)) { 
+        printf("Error number, try again!\n");
+        free_buff();  // Clear input buffer if previous input has errors
     }
-    
+    if (*directory != NULL) {
+        if (add_contact(directory, number, name, lastname) == 0) {
+            printf("Failed to add new contact\n");
+        }
+    }else {
+        *directory = init_directory(number, name, lastname);
+    }
 }
 void free_buff() {
     char ch;
@@ -78,11 +89,10 @@ void print_menu() {
     printf("4 - for exit\n");
 }
 void menu() {
-    struct telephone_directory directory;
-    init_directory(&directory);
+    struct contact* directory = NULL;
     int comand = 0;
     while (comand != EXIT) {
-        printf("\033[H\033[J");  // clear screen
+        //printf("\033[H\033[J");  // clear screen
         print_menu();
         scanf("%d", &comand);
         switch(comand) {
@@ -93,10 +103,10 @@ void menu() {
                 menu_delete(&directory);
                 break;
             case(FIND):
-                menu_find(&directory);
+                menu_find(directory);
                 break;
             case(OUTPUT_CONTACTS):
-                print_all_contact(&directory);
+                print_all_contact(directory);
                 break;
             case(EXIT):
                 break;
@@ -106,4 +116,5 @@ void menu() {
         }
         free_buff();
     }
+    free_telephone_directory(directory);
 }
