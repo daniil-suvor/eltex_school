@@ -5,10 +5,11 @@
 #include <string.h>
 #include "stack.h"
 
-void print_menu();
+void print_menu(struct stack* head);
 void free_buff();
 void menu();
 void find_name(char* func_name, char* library);
+struct stack* init_plagins();
 
 int main() {
     menu();
@@ -19,28 +20,52 @@ void find_name(char* func_name, char* library) {
         func_name[i - 3] = library[i];
     }
 }
-void print_menu() {
+void print_menu(struct stack* head) {
     printf("Menu of calculator\n");
     printf("Input comand:\n");
-    printf("1 - for sum\n");
-    printf("2 - for difference\n");
-    printf("3 - for product\n");
-    printf("4 - for fraction\n");
-    printf("5 - for exit\n");
+    while (head != NULL) {
+        printf("%d - for %s\n", head->number, head->name_func);
+        head = head->next;
+    }
+    printf("-1 - for exit\n");
 }
 void free_buff() {
     char ch;
     while ((ch = getchar()) != '\n') {}
 }
 void menu() {
-    void *library;	// хандлер внешней библиотеки
-	void (*func)();	// переменная для хранения адреса функции
-
-	//загрузка библиотеки
+    void (*func)();
+    struct stack* head = init_plagins();
+    int comand = 0;
+    struct stack* buff;
+    while(comand != -1) {
+        print_menu(head);
+        if ((scanf("%d", &comand) == 1) && (comand <= head->number) && (comand >= 0)) {
+            buff = head;
+            while ((buff != NULL) && (buff->number != comand)) {
+                buff = buff->next;
+            }
+            func = (buff->func);
+            func();
+        } else if (comand != -1) {
+            printf("Error comand!\n\n");
+            free_buff();
+        }
+    }
+    buff = head;
+    while (buff != NULL) {
+        dlclose(buff->library);
+        buff = buff->next;
+    }
+    free_stack(head);
+}
+struct stack* init_plagins() {
+    void *library;
+	void (*func)();
     DIR *folder;
     struct dirent *entry;
     folder = opendir("plagins/");
-    if(folder == NULL) {
+    if (folder == NULL) {
         perror("Unable to read directory");
         exit(0);
     }
@@ -66,43 +91,5 @@ void menu() {
         }
     }
     closedir(folder);
-    func = (head->func);
-    func();
-    // int comand = 0;
-    // while(comand != 5) {
-    //     print_menu();
-    //     if (scanf("%d", &comand) != 1) {
-    //         free_buff();
-    //         comand = 6;
-    //     }
-    //     switch(comand) {
-    //         case 1:
-    //             check_scanf(&a, &b);
-    //             printf("rezult is %d\n", sum(a, b));
-    //             break;
-    //         case 2:
-    //             check_scanf(&a, &b);
-    //             printf("rezult is %d\n", difference(a, b));
-    //             break;
-    //         case 3:
-    //             check_scanf(&a, &b);
-    //             printf("rezult is %d\n", product(a, b));
-    //             break;
-    //         case 4:
-    //             check_scanf(&a, &b);
-    //             printf("rezult is %d\n", fraction(a, b));
-    //             break;
-    //         case 5:
-    //             break;
-    //         default:
-    //             printf("Error comand!\n");
-    //             break;
-    //     }
-    // }
-    struct stack* buff = head;
-    while (buff != NULL) {
-        dlclose(buff->library);
-        buff = buff->next;
-    }
-    free_stack(head);
+    return head;
 }
