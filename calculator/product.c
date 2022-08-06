@@ -1,4 +1,10 @@
 #include "calculator.h"
-int product(int fractor1, int fractor2) {
-    return fractor1*fractor2;
+void product() {
+    int fractor1, fractor2;
+    printf("Input two integer arguments\n");
+    if (scanf("%d %d", &fractor1, &fractor2) == 2){
+        printf("result is %d\n", fractor1*fractor2);
+    } else {
+        printf("Error arguments!\n");
+    }
 }

@@ -1,21 +1,22 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include <stdlib.h>
-#include "calculator.h"
-void check_scanf(int* a, int* b);
+#include <dirent.h>
+#include <string.h>
+#include "stack.h"
+
 void print_menu();
 void free_buff();
 void menu();
+void find_name(char* func_name, char* library);
 
 int main() {
     menu();
     return 0;
 }
-void check_scanf(int* a, int* b) {
-    printf("Input arguments\n");
-    while (scanf("%d %d", a, b) != 2) {
-        printf("Error input, try again!\n");
-        free_buff();
+void find_name(char* func_name, char* library) {
+    for (int i = 3; library[i] != '.'; i++) {
+        func_name[i - 3] = library[i];
     }
 }
 void print_menu() {
@@ -32,20 +33,42 @@ void free_buff() {
     while ((ch = getchar()) != '\n') {}
 }
 void menu() {
-    void *sum_library;	// хандлер внешней библиотеки
-	int (*sum)(int, int);	// переменная для хранения адреса функции
+    void *library;	// хандлер внешней библиотеки
+	void (*func)();	// переменная для хранения адреса функции
 
 	//загрузка библиотеки
-	sum_library = dlopen("plagins/libsum.so", RTLD_LAZY);
-    if (!sum_library){
-		//если ошибка, то вывести ее на экран
-		fprintf(stderr, "dlopen() error: %s\n", dlerror());
-		exit(0);
-	}
-    sum = dlsym(sum_library, "sum");
-    int a, b; //, comand;
-    check_scanf(&a, &b);
-    printf("rezult is %d\n", sum(a, b));
+    DIR *folder;
+    struct dirent *entry;
+    folder = opendir("plagins/");
+    if(folder == NULL) {
+        perror("Unable to read directory");
+        exit(0);
+    }
+    int number = 0;
+    char* func_name;
+    struct stack* head = NULL;
+    while( (entry=readdir(folder))) {
+        char n[50] = "plagins/";
+        library = dlopen(strcat(n, entry->d_name), RTLD_LAZY);
+        if (library != NULL) {
+            func_name = calloc(strlen(entry->d_name) + 1, sizeof(char));
+            if (func_name == NULL)
+                exit(0);
+            find_name(func_name, entry->d_name);
+            func = dlsym(library, func_name);
+            if (head == NULL) {
+                head = init(number, func_name, func, library);
+            } else {
+                head = add(head, number, func_name, func, library);
+            }
+            number++;
+            free(func_name);
+        }
+    }
+    closedir(folder);
+    func = (head->func);
+    func();
+    // int comand = 0;
     // while(comand != 5) {
     //     print_menu();
     //     if (scanf("%d", &comand) != 1) {
@@ -76,5 +99,10 @@ void menu() {
     //             break;
     //     }
     // }
-    dlclose(sum_library);
+    struct stack* buff = head;
+    while (buff != NULL) {
+        dlclose(buff->library);
+        buff = buff->next;
+    }
+    free_stack(head);
 }
