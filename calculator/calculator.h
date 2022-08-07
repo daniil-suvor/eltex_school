@@ -6,4 +6,5 @@ void sum();
 void difference();
 void product();
 void fraction();
+void logorifm();
 #endif  // _CALCULATOR_H_

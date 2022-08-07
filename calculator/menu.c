@@ -5,63 +5,66 @@
 #include <string.h>
 #include "stack.h"
 
+#define MAX_LEM_FILE_NAME 256
+
 void print_menu(struct stack* head);
 void free_buff();
 void menu();
 void find_name(char* func_name, char* library);
 struct stack* init_plagins();
+void call_func(struct stack* head, int* comand);
+void close_lib(struct stack* head);
 
 int main() {
     menu();
     return 0;
 }
-void find_name(char* func_name, char* library) {
-    for (int i = 3; library[i] != '.'; i++) {
+void get_func_name(char* func_name, char* library) {
+    int i = 3;
+    for (i = 3; library[i] != '.'; i++) {
         func_name[i - 3] = library[i];
     }
+    func_name[i - 3] = '\0';
 }
 void print_menu(struct stack* head) {
     printf("Menu of calculator\n");
     printf("Input comand:\n");
     while (head != NULL) {
-        printf("%d - for %s\n", head->number, head->name_func);
+        printf("%3d - for %s\n", head->number, head->name_func);
         head = head->next;
     }
-    printf("-1 - for exit\n");
 }
 void free_buff() {
     char ch;
     while ((ch = getchar()) != '\n') {}
 }
 void menu() {
-    void (*func)();
     struct stack* head = init_plagins();
     int comand = 0;
-    struct stack* buff;
     while(comand != -1) {
         print_menu(head);
-        if ((scanf("%d", &comand) == 1) && (comand <= head->number) && (comand >= 0)) {
-            buff = head;
-            while ((buff != NULL) && (buff->number != comand)) {
-                buff = buff->next;
-            }
-            func = (buff->func);
-            func();
-        } else if (comand != -1) {
-            printf("Error comand!\n\n");
-            free_buff();
+        call_func(head, &comand);
+        putchar('\n');
+    }
+}
+void call_func(struct stack* head, int* comand) {
+    void (*func)();
+    if ((scanf("%d", comand) == 1) && (*comand <= head->number) && (*comand >= 0)) {
+        while ((head != NULL) && (head->number != *comand)) {
+            head = head->next;
         }
+        func = (head->func);
+        func();
+    } else if (*comand == -1) {
+        close_lib(head);
+    } else {
+        printf("Error comand!\n");
+        free_buff();
     }
-    buff = head;
-    while (buff != NULL) {
-        dlclose(buff->library);
-        buff = buff->next;
-    }
-    free_stack(head);
 }
 struct stack* init_plagins() {
-    void *library;
-	void (*func)();
+    void *library = NULL;
+	void (*func)() = NULL;
     DIR *folder;
     struct dirent *entry;
     folder = opendir("plagins/");
@@ -69,27 +72,30 @@ struct stack* init_plagins() {
         perror("Unable to read directory");
         exit(0);
     }
+    struct stack* head = init(-1, "exit", func, library);
     int number = 0;
-    char* func_name;
-    struct stack* head = NULL;
-    while( (entry=readdir(folder))) {
-        char n[50] = "plagins/";
-        library = dlopen(strcat(n, entry->d_name), RTLD_LAZY);
+    char func_name[MAX_LEM_FILE_NAME];
+    char* error;
+    while ((entry=readdir(folder)) != NULL) {
+        char plagins_adr[MAX_LEM_FILE_NAME + 10] = "plagins/";
+        library = dlopen(strcat(plagins_adr, entry->d_name), RTLD_LAZY);
         if (library != NULL) {
-            func_name = calloc(strlen(entry->d_name) + 1, sizeof(char));
-            if (func_name == NULL)
-                exit(0);
-            find_name(func_name, entry->d_name);
+            get_func_name(func_name, entry->d_name);
             func = dlsym(library, func_name);
-            if (head == NULL) {
-                head = init(number, func_name, func, library);
-            } else {
+            if ((error = dlerror()) == NULL)  {
                 head = add(head, number, func_name, func, library);
+                number++;
             }
-            number++;
-            free(func_name);
         }
     }
     closedir(folder);
     return head;
+}
+void close_lib(struct stack* head) {
+    struct stack* buff = head;
+    while (buff->next != NULL) {
+        dlclose(buff->library);
+        buff = buff->next;
+    }
+    free_stack(head);
 }
