@@ -1,5 +1,12 @@
 #ifndef _STACK_H_
 #define _STACK_H_
+/*
+    stack module for storing functions and open dynamic libraries.
+    implementation stack on linked list.
+    init - function to initialize a new stack element
+    add - function to add new element to head, return new head
+    free_stack - function to free allocated memory
+*/
 struct stack {
     struct stack* next;
     void *library;
