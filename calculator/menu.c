@@ -19,25 +19,6 @@ int main() {
     menu();
     return 0;
 }
-void get_func_name(char* func_name, char* library) {
-    int i = 3;
-    for (i = 3; library[i] != '.'; i++) {
-        func_name[i - 3] = library[i];
-    }
-    func_name[i - 3] = '\0';
-}
-void print_menu(struct stack* head) {
-    printf("Menu of calculator\n");
-    printf("Input comand:\n");
-    while (head != NULL) {
-        printf("%3d - for %s\n", head->number, head->name_func);
-        head = head->next;
-    }
-}
-void free_buff() {
-    char ch;
-    while ((ch = getchar()) != '\n') {}
-}
 void menu() {
     struct stack* head = init_plagins();
     int comand = 0;
@@ -47,20 +28,24 @@ void menu() {
         putchar('\n');
     }
 }
-void call_func(struct stack* head, int* comand) {
-    void (*func)();
-    if ((scanf("%d", comand) == 1) && (*comand <= head->number) && (*comand >= 0)) {
-        while ((head != NULL) && (head->number != *comand)) {
-            head = head->next;
-        }
-        func = (head->func);
-        func();
-    } else if (*comand == -1) {
-        close_lib(head);
-    } else {
-        printf("Error comand!\n");
-        free_buff();
+void print_menu(struct stack* head) {
+    printf("Menu of calculator\n");
+    printf("Input comand:\n");
+    while (head != NULL) {
+        printf("%3d - for %s\n", head->number, head->name_func);
+        head = head->next;
     }
+}
+void get_func_name(char* func_name, char* library) {
+    int i = 3;
+    for (i = 3; library[i] != '.'; i++) {
+        func_name[i - 3] = library[i];
+    }
+    func_name[i - 3] = '\0';
+}
+void free_buff() {
+    char ch;
+    while ((ch = getchar()) != '\n') {}
 }
 struct stack* init_plagins() {
     void *library = NULL;
@@ -90,6 +75,21 @@ struct stack* init_plagins() {
     }
     closedir(folder);
     return head;
+}
+void call_func(struct stack* head, int* comand) {
+    void (*func)();
+    if ((scanf("%d", comand) == 1) && (*comand <= head->number) && (*comand >= 0)) {
+        while ((head != NULL) && (head->number != *comand)) {
+            head = head->next;
+        }
+        func = (head->func);
+        func();
+    } else if (*comand == -1) {
+        close_lib(head);
+    } else {
+        printf("Error comand!\n");
+        free_buff();
+    }
 }
 void close_lib(struct stack* head) {
     struct stack* buff = head;

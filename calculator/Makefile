@@ -26,5 +26,7 @@ menu.o: menu.c
 	$(CC) $(CFLAGS) menu.c
 menu: plagins menu.o stack.o
 	$(CC) stack.o menu.o -o menu -ldl
+check_leak: menu
+	valgrind --leak-check=full ./menu < test.txt
 clean:
 	rm *.o | rm plagins/*.so | rm menu
