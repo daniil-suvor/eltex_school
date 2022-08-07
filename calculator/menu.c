@@ -10,7 +10,7 @@
 void print_menu(struct stack* head);
 void free_buff();
 void menu();
-void find_name(char* func_name, char* library);
+void get_func_name(char* func_name, char* library);
 struct stack* init_plagins();
 void call_func(struct stack* head, int* comand);
 void close_lib(struct stack* head);
