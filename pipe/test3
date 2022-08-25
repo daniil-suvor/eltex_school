@@ -1,0 +1,1 @@
+cat my_bash.c -n | grep -T -eint | grep for
