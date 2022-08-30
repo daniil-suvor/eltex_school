@@ -28,7 +28,6 @@ void* listener(void* arg) {
                 waddstr(list_subwind, message.from + 1);
                 waddstr(list_subwind, message.mes);
                 wrefresh(list_subwind);
-                refresh();
             pthread_spin_unlock(&lock);
         }
         if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) {
@@ -53,7 +52,7 @@ void* sender(void* arg) {
             message.type = 1;
             mq_send(server, (char*)&message, sizeof(struct message), 0);
             break;
-        } else {
+        } else if (message.mes[0] != '\0') {
             message.type = 2;
             if (mq_send(server, (char*)&message, sizeof(struct message), 0) == -1) {
                 fprintf(stderr, "Erorr send message to server\n");
